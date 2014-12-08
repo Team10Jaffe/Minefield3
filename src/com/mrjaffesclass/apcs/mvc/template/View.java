@@ -23,7 +23,7 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
     mvcMessaging = messages;   // Save the calling controller instance
     initComponents();           // Create and init the GUI components
   }
-  JButton buttonArray[][] = new JButton[8][8];
+  public static JButton buttonArray[][] = new JButton[8][8];
   public void createArray(){
     
     buttonArray[0][0] = jButton1;
@@ -97,6 +97,7 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
         for (int j = 0; j <= 7; j++){
             buttonArray[i][j].putClientProperty("column", i);
             buttonArray[i][j].putClientProperty("row", j);
+            buttonArray[i][j].putClientProperty("bomb", false);
             buttonArray[i][j].addActionListener(this);
         }
     }
