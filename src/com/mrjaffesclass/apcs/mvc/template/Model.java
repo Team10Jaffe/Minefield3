@@ -14,8 +14,8 @@ public class Model implements MessageHandler {
   private final Messenger mvcMessaging;
 
   // Model's data variables
-  private int variable1;
-  private int variable2;
+  public int lives = 3;
+  public int score = 0;
   Random rand = new Random();
   /**
    * Model constructor: Create the data representation of the program
@@ -34,6 +34,12 @@ public class Model implements MessageHandler {
     mvcMessaging.subscribe("controller:init", this);
     plantBombs();
   }
+  
+  private MessagePayload createPayload(int columnNumber, int rowNumber, int[] columns, int[] rows, boolean bombState, int lives, int score) {
+    MessagePayload payload = new MessagePayload(columnNumber, rowNumber, columns, rows, bombState, lives, score);
+    return payload;
+  }
+  
   public void plantBombs() {
     double mineArray[] = new double[10];
     int columnArray[] = new int[10];
@@ -47,10 +53,7 @@ public class Model implements MessageHandler {
         else {
             rowArray[i] = (int)(mineArray[i]%8) - 1;
         }
-        /*System.out.println(mineArray[i]);
-        System.out.println(columnArray[i]);
-        System.out.println(rowArray[i]); */
-        View.buttonArray[columnArray[i]][rowArray[i]].putClientProperty("bomb", true);
+        mvcMessaging.notify("model:bombsPlanted", createPayload(0, 0, columnArray, rowArray, true, 0, 0), true);
         System.out.println("Bomb planted at Column: " + columnArray[i] + " and Row: " + rowArray[i]);
     }
     
@@ -67,23 +70,25 @@ public class Model implements MessageHandler {
     MessagePayload payload = (MessagePayload)messagePayload;
     int column = payload.getColumn();
     int row = payload.getRow();
-    System.out.println("Special: Received column: " + column + " and row: " + row);
+    boolean bombState = payload.getBombState();
     
       switch (messageName) {
-          case "controller:init":
-              break;
-          case "view:buttonClicked":
-              boolean bombState = (boolean)View.buttonArray[column][row].getClientProperty("bomb");
+            case "controller:init":
+                break;
+            case "view:buttonClicked":
               if (bombState == true){
-                  mvcMessaging.notify("model:bombClicked");
+                  mvcMessaging.notify("model:bombClicked", createPayload(column, row, null, null, bombState, 0, 0), true);
                   System.out.println("Bomb clicked!");
+                  decreaseLives();
               }
               else {
-                  mvcMessaging.notify("model:safeClicked");
+                  mvcMessaging.notify("model:safeClicked", createPayload(column, row, null, null, bombState, 0, 0), true);
                   System.out.println("Not bomb clicked!");
+                  increaseScore();
               }
               break;
       }
+    /*
     if (column == 0) {
       if (row == 0) {
         System.out.println("Received column: " + column + " and row: " + row);
@@ -91,7 +96,7 @@ public class Model implements MessageHandler {
         //setVariable2(getVariable2()+Constants.FIELD_2_INCREMENT);
       }
     } 
-    /*else {
+    else {
       if (column == 1) {
         setVariable1(getVariable1()-Constants.FIELD_1_INCREMENT);
       } else {
@@ -102,43 +107,38 @@ public class Model implements MessageHandler {
    
     
   /**
-   * Getter function for variable 1
-   * @return Value of variable1
+   * Getter function for lives
+   * @return # of lives left
    */
-  public int getVariable1() {
-    return variable1;
+  public int getLives() {
+    return lives;
   }
 
   /**
-   * Setter function for variable 1
-   * @param v New value of variable1
+   * Decreases life count by 1
    */
-  public void setVariable1(int v) {
-    variable1 = v;
-    // When we set a new value to variable 1 we need to also send a
-    // message to let other modules know that the variable value
-    // was changed
-    mvcMessaging.notify("model:variable1Changed", variable1, true);
+  public void decreaseLives() {
+    lives = lives + (-1);
+    if (lives == 0){
+        mvcMessaging.notify("model:gameOver");
+    }
+    mvcMessaging.notify("model:livesChanged", createPayload(0, 0, null, null, true, lives, score), true);
   }
   
   /**
-   * Getter function for variable 1
-   * @return Value of variable2
+   * Getter function for score
+   * @return Value of score
    */
-  public int getVariable2() {
-    return variable2;
+  public int getScore() {
+    return score;
   }
   
   /**
-   * Setter function for variable 2
-   * @param v New value of variable 2
+   * Increases score by 1
    */
-  public void setVariable2(int v) {
-    variable2 = v;
-    // When we set a new value to variable 2 we need to also send a
-    // message to let other modules know that the variable value
-    // was changed
-    mvcMessaging.notify("model:variable2Changed", variable2, true);
+  public void increaseScore() {
+    score = score + 1;
+    mvcMessaging.notify("model:scoreChanged", createPayload(0, 0, null, null, true, lives, score), true);
   }
 
 }

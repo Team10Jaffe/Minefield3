@@ -1,5 +1,6 @@
 package com.mrjaffesclass.apcs.mvc.template;
 import com.mrjaffesclass.apcs.messenger.*;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
@@ -109,8 +110,12 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
   public void init() {
     // Subscribe to messages here
     mvcMessaging.subscribe("controller:init", this);
-    mvcMessaging.subscribe("model:Bomb", this);
-    mvcMessaging.subscribe("model:Safe", this);
+    mvcMessaging.subscribe("model:bombsPlanted", this);
+    mvcMessaging.subscribe("model:bombClicked", this);
+    mvcMessaging.subscribe("model:safeClicked", this);
+    mvcMessaging.subscribe("model:livesChanged", this);
+    mvcMessaging.subscribe("model:scoreChanged", this);
+    mvcMessaging.subscribe("model:gameOver", this);
   }
   
  @Override
@@ -120,11 +125,37 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
     } else {
       System.out.println("MSG: received by view: "+messageName+" | No data sent");
     }
-    if (messageName.equals("controller:init")) {
-      createArray();
-      assignClientProperties();
-    } 
-    
+    MessagePayload payload = (MessagePayload)messagePayload;
+        switch (messageName) {
+            case "controller:init":
+                createArray();
+                assignClientProperties();
+                jLabel3.setVisible(false);
+                break;
+            case "model:bombsPlanted":
+                for (int i = 0; i < 10; i++){
+                    int[] column = payload.getColumns();
+                    int[] row = payload.getRows();  
+                    buttonArray[column[i]][row[i]].putClientProperty("bomb", true);
+                }
+                break;
+            case "model:bombClicked":
+                buttonArray[payload.getColumn()][payload.getRow()].setBackground(Color.red);
+                break;
+            case "model:safeClicked":
+                buttonArray[payload.getColumn()][payload.getRow()].setBackground(Color.green);
+                buttonArray[payload.getColumn()][payload.getRow()].setForeground(Color.green);
+                break;
+            case ("model:livesChanged"):
+                jTextField2.setText(payload.getLives() + "");
+                break;
+            case "model:scoreChanged":
+                jTextField1.setText(payload.getScore() + "");
+                break;
+            case "model:gameOver":
+                jLabel3.setVisible(true);
+                break;
+      }
   }
 
   /**
@@ -134,8 +165,8 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
    * @param direction this.UP (1) or this.DOWN (-1), constants defined above
    * @return the HashMap payload to be sent with the message
    */
-  private MessagePayload createPayload(int columnNumber, int rowNumber) {
-    MessagePayload payload = new MessagePayload(columnNumber, rowNumber);
+  private MessagePayload createPayload(int columnNumber, int rowNumber, int[] columns, int[] rows, boolean bombState, int lives, int score) {
+    MessagePayload payload = new MessagePayload(columnNumber, rowNumber, columns, rows, bombState, lives, score);
     return payload;
   }
 
@@ -212,269 +243,125 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
         jButton62 = new javax.swing.JButton();
         jButton63 = new javax.swing.JButton();
         jButton64 = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jTextField1 = new javax.swing.JTextField();
+        jTextField2 = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        getContentPane().add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 13, -1, 25));
+        getContentPane().add(jButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 45, -1, 25));
+        getContentPane().add(jButton3, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 77, -1, 25));
+        getContentPane().add(jButton4, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 109, -1, 25));
+        getContentPane().add(jButton5, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 141, -1, 25));
+        getContentPane().add(jButton6, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 173, -1, 25));
+        getContentPane().add(jButton7, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 205, -1, 25));
+        getContentPane().add(jButton8, new org.netbeans.lib.awtextra.AbsoluteConstraints(12, 237, -1, 25));
+        getContentPane().add(jButton9, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 13, -1, 25));
+        getContentPane().add(jButton10, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 45, -1, 25));
+        getContentPane().add(jButton11, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 77, -1, 25));
+        getContentPane().add(jButton12, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 109, -1, 25));
+        getContentPane().add(jButton13, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 141, -1, 25));
+        getContentPane().add(jButton14, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 173, -1, 25));
+        getContentPane().add(jButton15, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 205, -1, 25));
+        getContentPane().add(jButton16, new org.netbeans.lib.awtextra.AbsoluteConstraints(52, 237, -1, 25));
+        getContentPane().add(jButton17, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 13, -1, 25));
+        getContentPane().add(jButton18, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 45, -1, 25));
+        getContentPane().add(jButton19, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 77, -1, 25));
+        getContentPane().add(jButton20, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 109, -1, 25));
+        getContentPane().add(jButton21, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 141, -1, 25));
+        getContentPane().add(jButton22, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 173, -1, 25));
+        getContentPane().add(jButton23, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 205, -1, 25));
+        getContentPane().add(jButton24, new org.netbeans.lib.awtextra.AbsoluteConstraints(92, 237, -1, 25));
+        getContentPane().add(jButton25, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 13, -1, 25));
+        getContentPane().add(jButton26, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 45, -1, 25));
+        getContentPane().add(jButton27, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 77, -1, 25));
+        getContentPane().add(jButton28, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 109, -1, 25));
+        getContentPane().add(jButton29, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 141, -1, 25));
+        getContentPane().add(jButton30, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 173, -1, 25));
+        getContentPane().add(jButton31, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 205, -1, 25));
+        getContentPane().add(jButton32, new org.netbeans.lib.awtextra.AbsoluteConstraints(132, 237, -1, 25));
+        getContentPane().add(jButton33, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 13, -1, 25));
+        getContentPane().add(jButton34, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 45, -1, 25));
+        getContentPane().add(jButton35, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 77, -1, 25));
+        getContentPane().add(jButton36, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 109, -1, 25));
+        getContentPane().add(jButton37, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 141, -1, 25));
+        getContentPane().add(jButton38, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 173, -1, 25));
+        getContentPane().add(jButton39, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 205, -1, 25));
+        getContentPane().add(jButton40, new org.netbeans.lib.awtextra.AbsoluteConstraints(172, 237, -1, 25));
+        getContentPane().add(jButton41, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 13, -1, 25));
+        getContentPane().add(jButton42, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 45, -1, 25));
+        getContentPane().add(jButton43, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 77, -1, 25));
+        getContentPane().add(jButton44, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 109, -1, 25));
+        getContentPane().add(jButton45, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 141, -1, 25));
+        getContentPane().add(jButton46, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 173, -1, 25));
+        getContentPane().add(jButton47, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 205, -1, 25));
+        getContentPane().add(jButton48, new org.netbeans.lib.awtextra.AbsoluteConstraints(212, 237, -1, 25));
+        getContentPane().add(jButton49, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 13, -1, 25));
+        getContentPane().add(jButton50, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 45, -1, 25));
+        getContentPane().add(jButton51, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 77, -1, 25));
+        getContentPane().add(jButton52, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 109, -1, 25));
+        getContentPane().add(jButton53, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 141, -1, 25));
+        getContentPane().add(jButton54, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 173, -1, 25));
+        getContentPane().add(jButton55, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 205, -1, 25));
+        getContentPane().add(jButton56, new org.netbeans.lib.awtextra.AbsoluteConstraints(252, 237, -1, 25));
+        getContentPane().add(jButton57, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 13, -1, 25));
+        getContentPane().add(jButton58, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 45, -1, 25));
+        getContentPane().add(jButton59, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 77, -1, 25));
+        getContentPane().add(jButton60, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 109, -1, 25));
+        getContentPane().add(jButton61, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 141, -1, 25));
+        getContentPane().add(jButton62, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 173, -1, 25));
+        getContentPane().add(jButton63, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 205, -1, 25));
+        getContentPane().add(jButton64, new org.netbeans.lib.awtextra.AbsoluteConstraints(292, 237, -1, 25));
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2)
-                            .addComponent(jButton3)
-                            .addComponent(jButton4)
-                            .addComponent(jButton5))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton9)
-                            .addComponent(jButton10)
-                            .addComponent(jButton11)
-                            .addComponent(jButton12)
-                            .addComponent(jButton13))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jButton17)
-                                        .addComponent(jButton18)
-                                        .addComponent(jButton19))
-                                    .addComponent(jButton21))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jButton29))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(jButton25)
-                                            .addComponent(jButton26, javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jButton27, javax.swing.GroupLayout.Alignment.LEADING)))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton20)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton28)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jButton34)
-                                .addComponent(jButton33))
-                            .addComponent(jButton35)
-                            .addComponent(jButton36, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton37, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton41)
-                            .addComponent(jButton42)
-                            .addComponent(jButton43)
-                            .addComponent(jButton44)
-                            .addComponent(jButton45))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jButton52)
-                                        .addComponent(jButton49))
-                                    .addComponent(jButton50))
-                                .addComponent(jButton51))
-                            .addComponent(jButton53))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton57)
-                            .addComponent(jButton58)
-                            .addComponent(jButton59)
-                            .addComponent(jButton60, javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton61))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton6)
-                            .addComponent(jButton8)
-                            .addComponent(jButton7))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jButton14)
-                                .addComponent(jButton15))
-                            .addComponent(jButton16))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton24)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton32))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton22)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton30))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton23)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton31)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton38, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton39, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton40, javax.swing.GroupLayout.Alignment.LEADING))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jButton46)
-                                .addComponent(jButton47))
-                            .addComponent(jButton48))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton54)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButton62))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton56)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton64))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton55)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton63, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))))
-                .addContainerGap())
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton33, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton41, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jButton49, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addGroup(layout.createSequentialGroup()
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGap(0, 0, Short.MAX_VALUE)
-                                            .addComponent(jButton27, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                .addComponent(jButton34, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                                    .addComponent(jButton18, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                    .addGroup(layout.createSequentialGroup()
-                                                        .addComponent(jButton9, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                        .addComponent(jButton10, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                    .addGroup(layout.createSequentialGroup()
-                                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                            .addComponent(jButton25, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                            .addComponent(jButton17, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                        .addComponent(jButton26, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                .addComponent(jButton42, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                .addComponent(jButton19, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jButton11, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jButton35, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jButton43, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jButton51, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addComponent(jButton59, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jButton12, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton20, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton28, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton36, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton44, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton52, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(jButton57, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton50, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jButton58, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(39, 39, 39)
-                                        .addComponent(jButton60, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton5, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(jButton61, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jButton21, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton29, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton37, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton45, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton53, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jButton13, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jButton6, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton7, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton8, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton15, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                        .addComponent(jButton22, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton30, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton38, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton46, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton54, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton62, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jButton14, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                        .addComponent(jButton23, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton31, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton39, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton47, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addComponent(jButton55, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addComponent(jButton63, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jButton24, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton32, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton40, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton48, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton56, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButton64, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jButton16, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
-        );
+        jLabel1.setText("Score:");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 280, -1, -1));
+
+        jLabel2.setText("Lives:");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(167, 283, -1, -1));
+
+        jTextField1.setText("0");
+        jTextField1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField1ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(62, 280, 100, -1));
+
+        jTextField2.setText("3");
+        jTextField2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jTextField2ActionPerformed(evt);
+            }
+        });
+        getContentPane().add(jTextField2, new org.netbeans.lib.awtextra.AbsoluteConstraints(205, 280, 90, -1));
+
+        jLabel3.setText("GAME OVER");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(136, 315, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jTextField2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField2ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField2ActionPerformed
+
+    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jTextField1ActionPerformed
 
   @Override
     public void actionPerformed(ActionEvent e){
         JButton button = (JButton)e.getSource();
         int buttonColumn = (int)button.getClientProperty("column");
         int buttonRow = (int)button.getClientProperty("row");
-        //client props not being represented as int
+        boolean bombState = (boolean)button.getClientProperty("bomb");
         System.out.println("Column: " + buttonColumn);
         System.out.println("Row: " + buttonRow);
-        mvcMessaging.notify("view:buttonClicked", createPayload(buttonColumn, buttonRow), true);   
+        System.out.println("Bomb?: " + bombState);
+        mvcMessaging.notify("view:buttonClicked", createPayload(buttonColumn, buttonRow, null, null, bombState, 0, 0), true);   
     }
   /**
    * @param args the command line arguments
@@ -545,6 +432,11 @@ public class View extends javax.swing.JFrame implements MessageHandler, ActionLi
     private javax.swing.JButton jButton7;
     private javax.swing.JButton jButton8;
     private javax.swing.JButton jButton9;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JTextField jTextField1;
+    private javax.swing.JTextField jTextField2;
     // End of variables declaration//GEN-END:variables
 
     
